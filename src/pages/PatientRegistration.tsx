@@ -72,7 +72,7 @@ export default function PatientRegistration() {
     setSymptom(''); // Reset symptom when department changes
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
@@ -95,30 +95,36 @@ export default function PatientRegistration() {
       return;
     }
 
-    registerPatient({
-      name: result.data.name,
-      age: result.data.age,
-      department: result.data.department as Department,
-      symptom: result.data.symptom,
-      symptomSeverity: getSymptomSeverity(),
-      visitType: result.data.visitType,
-      vulnerabilities,
-    });
+    try {
+      await registerPatient({
+        name: result.data.name,
+        age: result.data.age,
+        department: result.data.department as Department,
+        symptom: result.data.symptom,
+        symptomSeverity: getSymptomSeverity(),
+        visitType: result.data.visitType,
+        vulnerabilities,
+      });
 
-    // Reset form
-    setName('');
-    setAge('');
-    setDepartment('general_medicine');
-    setSymptom('');
-    setVisitType('routine');
-    setVulnerabilities({
-      elderly: false,
-      pregnant: false,
-      disabled: false,
-      chronicCondition: false,
-    });
+      // Reset form
+      setName('');
+      setAge('');
+      setDepartment('general_medicine');
+      setSymptom('');
+      setVisitType('routine');
+      setVulnerabilities({
+        elderly: false,
+        pregnant: false,
+        disabled: false,
+        chronicCondition: false,
+      });
 
-    navigate(`/queue?department=${department}`);
+      // Navigate after successful registration
+      navigate(`/queue?department=${department}`);
+    } catch (error) {
+      console.error('Registration failed:', error);
+      // Error toast is already shown by registerPatient function
+    }
   };
 
   const toggleVulnerability = (key: keyof VulnerabilityFlags) => {
